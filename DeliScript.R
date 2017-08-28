@@ -35,8 +35,7 @@ str(Merged)
 head(DVR1)
 
 #PLOTS
-plot(Hide_Duration ~ TotalDist, data = DVR)
-
+TreatmentVDist=plot(TotalDist ~ Trt, data = DVR)
 
 #REMOVING VOID TRIALS
 summary(DVR$Arena_Duration)
