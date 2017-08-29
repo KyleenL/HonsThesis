@@ -24,11 +24,12 @@ summarise(group_by(datTest, Month), mean = mean(Ozone, na.rm = TRUE))
 
 xtabs(~Month, data=datTest)
 
-
-
 #HONOURS
 Merged = merge(DVR1, DVR2, all=TRUE)
 DVR = merge(Merged, DVR3, all = TRUE)
+#for experimental changes
+    DVR.Master = DVR
+
 
 length(unique(DVR$LizID))
 str(Merged)
@@ -38,7 +39,16 @@ head(DVR1)
 TreatmentVDist=plot(TotalDist ~ Trt, data = DVR)
 
 #REMOVING VOID TRIALS
-summary(DVR$Arena_Duration)
-DVR[is.na(DVR$Arena_Duration),]
-is.na(DVR$Arena_Duration)
-DVR <- DVR[!is.na(DVR$Arena_Duration),]
+summary(DVR.Master$Arena_Duration)
+DVR.Master[is.na(DVR.Master$Arena_Duration),]
+is.na(DVR.Master$Arena_Duration)
+DVR.Master <- DVR.Master[!is.na(DVR.Master$Arena_Duration),]
+
+#CLEANING DATA
+DVR.Master$Result <- NULL
+install.packages("stringr")
+library(stringr)
+stringr::str_split_fixed
+str_split_fixed(DVR.Master$ChDate, "_", 2)
+group_by(DVR.Master, LizID)
+DVR.Master[ ! DVR.Master$Sex %in% c(M), ]
