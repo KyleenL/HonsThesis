@@ -91,9 +91,6 @@ p4 <- ggplot(DVR.Master,aes(y = Social_Duration, x = factor(Trt))) + geom_boxplo
 p5 <- ggplot(DVR.Master,aes(y = Hide_Freq, x = factor(Trt))) + geom_boxplot()
 p6 <- ggplot(DVR.Master,aes(y = NovZone_LatFirst, x = factor(Trt))) + geom_boxplot()
 
-?ggplot
-?facet_wrap
-?fill
 
 grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 2, ncol = 3)
 grid.arrange(p1, nrow = 2, ncol = 2)
