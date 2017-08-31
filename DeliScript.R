@@ -2,7 +2,7 @@ DVR1=read.csv("DVR1Data.csv")
 DVR2=read.csv("DVR2Data.csv")
 DVR3=read.csv("DVR3Data.csv")
 BodySize=read.csv("BodySize.csv")
-install.packages("car")
+
 
 datTest <- airquality
 head(datTest)
@@ -38,8 +38,11 @@ library(gridExtra)
 install.packages("stringr") 
 library(stringr)
 
+install.packages("car")
+library(car)
 
-#HONOURS
+
+#####HONOURS#####
 Merged = merge(DVR1, DVR2, all=TRUE)
 DVR = merge(Merged, DVR3, all = TRUE)
 
@@ -49,7 +52,7 @@ DVR = merge(Merged, DVR3, all = TRUE)
 
 str(DVR.Master)
 
-#HISTOGRAMS
+#####HISTOGRAMS#####
 
 #Total Distance
 hist(DVR.Master$TotalDist)  ;  shapiro.test(DVR.Master$TotalDist)
@@ -80,12 +83,12 @@ hist(log(DVR.Master$Asocial_LatFirst)) ;  shapiro.test(DVR.Master$Asocial_LatFir
 
 
 
-#SCATTERPLOT
+#####SCATTERPLOT#####
 pairs(DVR.Master[,c(11, 14, 17, 24,30)])  #compares all durations 
 pairs(DVR.Master[,c(10, 13, 16, 20, 23, 26, 29)])   #compares all frequencies
 
 
-#BOXPLOT
+#####BOXPLOT#####
 p1 <- ggplot(DVR.Master,aes(y = TotalDist, x = factor(Trt))) + geom_boxplot() + labs(x="Treatment",y="Total Distance (cm)") 
 p2 <- ggplot(DVR.Master,aes(y = Hide_Duration, x = factor(Trt))) + geom_boxplot() + labs(x="Treatment",y="Time spent in Hide (s)") 
 p3 <- ggplot(DVR.Master,aes(y = NovZone_Duration, x = factor(Trt))) + geom_boxplot() + labs(x="Treatment",y="Time in Novel Zone (s)") 
@@ -98,7 +101,7 @@ grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 2, ncol = 3)
 grid.arrange(p1, nrow = 2, ncol = 2)
 ##how to create boxplot with High vs Low but only within certain assays???
 
-#OUTLIERS
+#####OUTLIERS#####
 
 DVR.Master$obs <- seq(1:nrow(DVR.Master))
 
@@ -125,16 +128,19 @@ ggplot(DVR.Master, aes(NovItem_Duration, obs, label = obs)) +
   geom_vline(aes(xintercept = (mean(DVR.Master$NovItem_Duration, na.rm = T) - (sd(DVR.Master$NovItem_Duration, na.rm = T)*3)), color = "red"))
 
 
-#REMOVING VOID TRIALS
+#####REMOVING VOID TRIALS#####
 summary(DVR.Master$Arena_Duration)
 DVR.Master[is.na(DVR.Master$Arena_Duration),]
 is.na(DVR.Master$Arena_Duration)
 DVR.Master <- DVR.Master[!is.na(DVR.Master$Arena_Duration),]
 
-#CLEANING DATA
+#####CLEANING DATA#####
 DVR.Master$Results <- NULL   #removes Result column
 DVR.Master$Arena_Freq <- NULL   #removes Arena Freq column
 
 str_split_fixed(DVR.Master$ChDate, "_", 2)  #attempt to split ChDate Column
 group_by(DVR.Master, LizID)       #tried grouping by same ID
 DVR.Master[ ! DVR.Master$Sex %in% c(M), ]     #tried removing M rows
+
+
+
