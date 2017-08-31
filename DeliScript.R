@@ -35,7 +35,8 @@ library(ggplot2)
 install.packages("gridExtra")
 library(gridExtra)
 
-
+install.packages("stringr") 
+library(stringr)
 
 
 #HONOURS
@@ -80,16 +81,17 @@ hist(log(DVR.Master$Asocial_LatFirst)) ;  shapiro.test(DVR.Master$Asocial_LatFir
 
 
 #SCATTERPLOT
-pairs(DVR.Master[,c(11, 14, 17, 24,30)])    #compares all durations 
+pairs(DVR.Master[,c(11, 14, 17, 24,30)])  #compares all durations 
+pairs(DVR.Master[,c(10, 13, 16, 20, 23, 26, 29)])   #compares all frequencies
 
 
 #BOXPLOT
-p1 <- ggplot(DVR.Master,aes(y = TotalDist, x = factor(Trt))) + geom_boxplot() 
-p2 <- ggplot(DVR.Master,aes(y = Hide_Duration, x = factor(Trt))) + geom_boxplot()
-p3 <- ggplot(DVR.Master,aes(y = NovItem_Duration, x = factor(Trt))) + geom_boxplot()
-p4 <- ggplot(DVR.Master,aes(y = Social_Duration, x = factor(Trt))) + geom_boxplot()
-p5 <- ggplot(DVR.Master,aes(y = Hide_Freq, x = factor(Trt))) + geom_boxplot()
-p6 <- ggplot(DVR.Master,aes(y = NovZone_LatFirst, x = factor(Trt))) + geom_boxplot()
+p1 <- ggplot(DVR.Master,aes(y = TotalDist, x = factor(Trt))) + geom_boxplot() + labs(x="Treatment",y="Total Distance (cm)") 
+p2 <- ggplot(DVR.Master,aes(y = Hide_Duration, x = factor(Trt))) + geom_boxplot() + labs(x="Treatment",y="Time spent in Hide (s)") 
+p3 <- ggplot(DVR.Master,aes(y = NovZone_Duration, x = factor(Trt))) + geom_boxplot() + labs(x="Treatment",y="Time in Novel Zone (s)") 
+p4 <- ggplot(DVR.Master,aes(y = Social_Duration, x = factor(Trt))) + geom_boxplot() + labs(x="Treatment",y="Time spent in Social Zone (s)") 
+p5 <- ggplot(DVR.Master,aes(y = Hide_Freq, x = factor(Trt))) + geom_boxplot()  + labs(x="Treatment",y="Hide Frequency") 
+p6 <- ggplot(DVR.Master,aes(y = NovZone_LatFirst, x = factor(Trt))) + geom_boxplot()  + labs(x="Treatment",y="Latency to Novel Zone (s)")
 
 
 grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 2, ncol = 3)
@@ -132,9 +134,6 @@ DVR.Master <- DVR.Master[!is.na(DVR.Master$Arena_Duration),]
 #CLEANING DATA
 DVR.Master$Results <- NULL   #removes Result column
 DVR.Master$Arena_Freq <- NULL   #removes Arena Freq column
-
-install.packages("stringr") 
-library(stringr)
 
 str_split_fixed(DVR.Master$ChDate, "_", 2)  #attempt to split ChDate Column
 group_by(DVR.Master, LizID)       #tried grouping by same ID
