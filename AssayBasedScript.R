@@ -1,3 +1,5 @@
+
+
 # install.packages("dplyr")
 library(dplyr)
 
@@ -16,12 +18,10 @@ library(stringr)
 # install.packages("car")
 library(car)
 
-
 DVR1=read.csv("DVR1Data.csv")
 DVR2=read.csv("DVR2Data.csv")
 DVR3=read.csv("DVR3Data.csv")
 BodySize=read.csv("BodySize.csv")
-
 
 Merged = merge(DVR1, DVR2, all=TRUE)
 DVRAll = merge(Merged, DVR3, all = TRUE)
@@ -31,6 +31,7 @@ rm(LogHighFemale)
 #####remove na#####
 DVR.Master <- filter(DVR.Master, !is.na(Arena_Duration))
 DVR.Female <- filter(DVR.Master, Sex == "F")
+#DVR.Female <- read.csv("DVR.Female.csv")
 
 Exploration <- filter(DVR.Female, Assay == "Exploration")
 nrow(distinct(DVR.Female, LizID))
@@ -38,7 +39,6 @@ nrow(distinct(DVR.Female, LizID))
 
 Novel <- filter(DVR.Female, Assay == "Novel")
 Social <- filter(DVR.Female, Assay == "Social") 
-
 
 #####NORMALITY#####
 #Exploration - Total Distance
@@ -202,12 +202,24 @@ install.packages("MCMCglmm")
 library("MCMCglmm")
 
 # subeset High diet
+varibs.need <- c("LizID", "TotalDist", "NovZone_LatFirst", "Social_Duration", "EndMass")
+Female.High <- filter(DVR.Female, Trt == "High")[varibs.need] # Contain NAs in cbind(varibs) 
+str(Female.High) #1302 obs
+Female.High.na.omit <- na.omit(Female.High) #Excluding NAs 961 obs
 
-prior <- list(R=list(V = diag(3), nu = 0.01), G=list(G1=diag(3), nu = 0.01))
+#priors
+prior <- list(R = list(V = diag(3), nu = 0.01), 
+              G = list(G1= list(V = diag(3), nu = 0.01)))
 
-?cbind
-
-modelHI <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ EndMass + trait-1, random = ~us(trait):LizID, rcov= ~us(trait):units, family = rep("gaussian", 3), prior = prior, nitt = 70000, burnin=10000, thin = 100, data = subset(DVR.Female, Trt == "High"))
+modelHI <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ EndMass + trait-1, 
+                    random = ~us(trait):LizID, 
+                    rcov= ~us(trait):units, 
+                    family = rep("gaussian", 3), 
+                    prior = prior, 
+                    nitt = 70000, 
+                    burnin = 10000, 
+                    thin = 100, 
+                    data = Female.High)
 summary(modelHI)
 
 names(DVR.Female)
