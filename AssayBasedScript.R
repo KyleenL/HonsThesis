@@ -26,7 +26,7 @@ BodySize=read.csv("BodySize.csv")
 Merged = merge(DVR1, DVR2, all=TRUE)
 DVRAll = merge(Merged, DVR3, all = TRUE)
 DVR.Master = left_join(DVRAll, BodySize, by = NULL)
-rm(DVR)
+rm(LogHighFemale)
 
 #####remove na#####
 DVR.Master <- filter(DVR.Master, !is.na(Arena_Duration))
@@ -156,6 +156,12 @@ SocialFiltered <- Social %>%
   )
 
 
+#High Female
+HighFemale <- filter(DVR.Female, Trt == "High")
+LogHighFemale <- HighFemale    
+LogHighFemale[, 10:49] <- log((LogHighFemale[13:39]) + 1)
+rm(datTest)
+
 ##### BOXPLOT #####
 
 
@@ -187,18 +193,24 @@ t.test(NovZone_Duration ~ Trt, data = Novel, var.equal = FALSE)
 ggplot(SocialFiltered, aes(x = Trt, y= mean_Social_Duration)) + geom_boxplot() + ggtitle("Social Zone Duration")
 t.test(mean_LogNovZone_Duration ~ Trt, data = NovelFiltered, var.equal = TRUE)
 
-## Bayesian approaches
+ggplot(SocialFiltered, aes(x = Trt, y= mean_Social_LatFirst)) + geom_boxplot() + ggtitle("Social Latency")
+t.test(mean_LogNovZone_Duration ~ Trt, data = NovelFiltered, var.equal = TRUE)
 
-install.packages(MCMCglmm)
-library(MCMCglmm)
+##### Bayesian approaches #####
 
-# subeset HIgh diet
+install.packages("MCMCglmm")
+library("MCMCglmm")
 
-High <- filter(DVR.Female, Trt == High)
+# subeset High diet
+
 prior <- list(R=list(V = diag(3), nu = 0.01), G=list(G1=diag(3), nu = 0.01))
 
-modelHI <- MCMCglmm(cbind(TotalDist, Novel_LatFirst, Social_Duration) ~ mass + trait-1, random = ~us(trait):id, rcov= ~us(trait):units, family = rep("Gaussian", 3), prior = prior, nitt = 70000, burnin=10000, thin = 100, data = subset(data, trt == "high"))
+?cbind
+
+modelHI <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ EndMass + trait-1, random = ~us(trait):LizID, rcov= ~us(trait):units, family = rep("gaussian", 3), prior = prior, nitt = 70000, burnin=10000, thin = 100, data = subset(DVR.Female, Trt == "High"))
 summary(modelHI)
+
+names(DVR.Female)
 
 posterior.mode(modelHI$VCV)
 HPDinterval(modelHI$VCV)
@@ -206,7 +218,11 @@ HPDinterval(modelHI$VCV)
 posterior.mode(modelHI$Sol)
 HPDinterval(modelHI$Sol)
 
-modelLOW <- MCMCglmm(cbind(Y1, Y2, Y3) ~ mass +  trait-1, random = ~us(trait):id, rcov= ~us(trait):units, family = rep("Gaussian", 3), prior = prior, nitt = 70000, burnin=10000, thin = 100, data = subset(data, trt == "low"))
+modelLOW <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ EndMass +  trait-1, random = ~us(trait):id, rcov= ~us(trait):units, family = rep("gaussian", 3), prior = prior, nitt = 70000, burnin=10000, thin = 100, data = subset(DVR.Female, Trt == "Low"))
 summary(modelLOW)
 
 posterior.mode(modelHI$VCV)
+
+#  subset Low Diet
+
+LowFemale <- filter(DVR.Master, Trt == "Low")
