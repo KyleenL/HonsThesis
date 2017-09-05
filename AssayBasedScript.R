@@ -202,17 +202,57 @@ install.packages("MCMCglmm")
 library("MCMCglmm")
 
 # subeset High diet
-varibs.need <- c("LizID", "TotalDist", "NovZone_LatFirst", "Social_Duration", "EndMass")
+varibs.need <- c("LizID", "Trt","TotalDist", "NovZone_LatFirst", "NovZone_Duration", "Social_Duration", "EndMass")
 Female.High <- filter(DVR.Female, Trt == "High")[varibs.need] # Contain NAs in cbind(varibs) 
 str(Female.High) #1302 obs
 Female.High.na.omit <- na.omit(Female.High) #Excluding NAs 961 obs
+
 
 #priors
 prior <- list(R = list(V = diag(3), nu = 0.01), 
               G = list(G1= list(V = diag(3), nu = 0.01)))
 
-modelHI <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ EndMass + trait-1, 
-                    random = ~us(trait):LizID, 
+#modelHI <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ EndMass + trait-1, 
+#                   random = ~us(trait):LizID, 
+#                    rcov= ~us(trait):units, 
+#                    family = rep("gaussian", 3), 
+#                    prior = prior, 
+#                    nitt = 70000, 
+#                    burnin = 10000, 
+#                    thin = 100, 
+#                    data = Female.High)
+
+#saveRDS(modelHI, "modelHI")
+modelHI <- readRDS("modelHI")
+plot(modelHI$VCV)
+autocorr(modelHI$VCV)
+
+summary(modelHI)
+posterior.mode(modelHI$VCV)
+HPDinterval(modelHI$VCV)
+
+scale(variable)
+
+posterior.mode(modelHI$Sol)
+HPDinterval(modelHI$Sol)
+
+
+#modelHI.NaOmit <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ EndMass + trait-1, 
+#                   random = ~us(trait):LizID, 
+#                    rcov= ~us(trait):units, 
+#                    family = rep("gaussian", 3), 
+#                    prior = prior, 
+#                    nitt = 70000, 
+#                    burnin = 10000, 
+#                    thin = 100, 
+#                    data = Female.High.na.omit)
+
+#saveRDS(modelHI.NaOmit, "modelHI.NaOmit")
+modelHI <- readRDS("modelHI")
+
+      #scaled
+modelHI.Scaled <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_LatFirst), scale(Social_Duration)) ~ EndMass + trait-1, 
+                   random = ~us(trait):LizID, 
                     rcov= ~us(trait):units, 
                     family = rep("gaussian", 3), 
                     prior = prior, 
@@ -220,21 +260,124 @@ modelHI <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ EndMas
                     burnin = 10000, 
                     thin = 100, 
                     data = Female.High)
+
+#saveRDS(modelHI.Scaled, "modelHI.Scaled")
+modelHI.Scaled <- readRDS("modelHI.Scaled")
+summary(modelHI.Scaled)
+
+
+
+
+#modelHI.NaOmit.Scaled <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_LatFirst), scale(Social_Duration)) ~ EndMass + trait-1, 
+#                   random = ~us(trait):LizID, 
+#                    rcov= ~us(trait):units, 
+#                    family = rep("gaussian", 3), 
+#                    prior = prior, 
+#                    nitt = 70000, 
+#                    burnin = 10000, 
+#                    thin = 100, 
+#                    data = Female.High.na.omit)
+
+#saveRDS(modelHI.NaOmit.Scaled, "modelHI.NaOmit.Scaled")
+modelHI <- readRDS("modelHI")
+plot(modelHI$VCV)
+autocorr(modelHI$VCV)
+
 summary(modelHI)
-
-names(DVR.Female)
-
 posterior.mode(modelHI$VCV)
 HPDinterval(modelHI$VCV)
+
+scale(variable)
 
 posterior.mode(modelHI$Sol)
 HPDinterval(modelHI$Sol)
 
-modelLOW <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ EndMass +  trait-1, random = ~us(trait):id, rcov= ~us(trait):units, family = rep("gaussian", 3), prior = prior, nitt = 70000, burnin=10000, thin = 100, data = subset(DVR.Female, Trt == "Low"))
-summary(modelLOW)
-
-posterior.mode(modelHI$VCV)
 
 #  subset Low Diet
 
-LowFemale <- filter(DVR.Master, Trt == "Low")
+Female.Low <- filter(DVR.Female, Trt == "Low")[varibs.need] # Contain NAs in cbind(varibs) 
+str(Female.Low) 
+Female.Low.na.omit <- na.omit(Female.Low) 
+
+#modelLOW <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = Female.Low)
+
+#saveRDS(modelLOW, "modelLOW")
+modelLOW <- readRDS("modelLOW")
+
+
+#modelLOW.NaOmit <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = Female.Low.na.omit)
+
+#saveRDS(modelLOW.NaOmit, "modelLOW.Na.omit")
+modelLow.NaOmit <- readRDS("modelLOW.NaOmit")
+
+
+modelLOW.Scaled <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_LatFirst), scale(Social_Duration)) ~ EndMass +  trait-1, 
+                     random = ~us(trait):LizID, 
+                     rcov= ~us(trait):units, 
+                     family = rep("gaussian", 3), 
+                     prior = prior, 
+                     nitt = 70000, 
+                     burnin=10000, 
+                     thin = 100, 
+                     data = Female.Low)
+
+saveRDS(modelLOW.Scaled, "modelLOW.Scaled")
+modelLOW <- readRDS("modelLOW.Scaled")
+
+names(Female.Low)
+summary(modelLOW)
+posterior.mode(modelHI$VCV)
+
+
+# All Female Data
+
+Female.All <- filter(DVR.Master, Sex == "F")[varibs.need] # Contain NAs in cbind(varibs) 
+str(DVR.Female) #2580 obs
+#modelALL <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ Trt + EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = DVR.Female)
+
+
+#saveRDS(modelALL, "modelALL")
+summary(modelALL)
+
+
+Female.All <- filter(DVR.Master, Sex == "F")[varibs.need] # Contain NAs in cbind(varibs) 
+str(Female.NaOmit)
+Female.NaOmit <- na.omit(Female.All) #1858 obvs
+
+#modelALL.NaOmit <- MCMCglmm(cbind(TotalDist, NovZone_LatFirst, Social_Duration) ~ Trt + EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = Female.NaOmit)
+
+#saveRDS(modelALL.NaOmit, "modelALL.NaOmit")
+
+summary(modelALL)
