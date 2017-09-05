@@ -200,6 +200,8 @@ t.test(mean_LogNovZone_Duration ~ Trt, data = NovelFiltered, var.equal = TRUE)
 
 install.packages("MCMCglmm")
 library("MCMCglmm")
+    
+    #####TotalDist, NovZone_LatFirst, NovZone_Duration#####
 
 # subeset High diet
 varibs.need <- c("LizID", "Trt","TotalDist", "NovZone_LatFirst", "NovZone_Duration", "Social_Duration", "EndMass")
@@ -251,15 +253,15 @@ HPDinterval(modelHI$Sol)
 modelHI <- readRDS("modelHI")
 
       #scaled
-modelHI.Scaled <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_LatFirst), scale(Social_Duration)) ~ EndMass + trait-1, 
-                   random = ~us(trait):LizID, 
-                    rcov= ~us(trait):units, 
-                    family = rep("gaussian", 3), 
-                    prior = prior, 
-                    nitt = 70000, 
-                    burnin = 10000, 
-                    thin = 100, 
-                    data = Female.High)
+#modelHI.Scaled <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_LatFirst), scale(Social_Duration)) ~ EndMass + trait-1, 
+#                   random = ~us(trait):LizID, 
+#                    rcov= ~us(trait):units, 
+#                    family = rep("gaussian", 3), 
+#                    prior = prior, 
+#                    nitt = 70000, 
+#                    burnin = 10000, 
+#                    thin = 100, 
+#                    data = Female.High)
 
 #saveRDS(modelHI.Scaled, "modelHI.Scaled")
 modelHI.Scaled <- readRDS("modelHI.Scaled")
@@ -327,18 +329,18 @@ modelLOW <- readRDS("modelLOW")
 modelLow.NaOmit <- readRDS("modelLOW.NaOmit")
 
 
-modelLOW.Scaled <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_LatFirst), scale(Social_Duration)) ~ EndMass +  trait-1, 
-                     random = ~us(trait):LizID, 
-                     rcov= ~us(trait):units, 
-                     family = rep("gaussian", 3), 
-                     prior = prior, 
-                     nitt = 70000, 
-                     burnin=10000, 
-                     thin = 100, 
-                     data = Female.Low)
+#modelLOW.Scaled <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_LatFirst), scale(Social_Duration)) ~ EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = Female.Low)
 
-saveRDS(modelLOW.Scaled, "modelLOW.Scaled")
-modelLOW <- readRDS("modelLOW.Scaled")
+#saveRDS(modelLOW.Scaled, "modelLOW.Scaled")
+modelLOW.Scaled <- readRDS("modelLOW.Scaled")
 
 names(Female.Low)
 summary(modelLOW)
@@ -381,3 +383,241 @@ Female.NaOmit <- na.omit(Female.All) #1858 obvs
 #saveRDS(modelALL.NaOmit, "modelALL.NaOmit")
 
 summary(modelALL)
+    
+    #Scaled
+#modelALL.Scaled <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_LatFirst), scale(Social_Duration)) ~ Trt + EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = DVR.Female)
+
+   
+#saveRDS(modelALL.Scaled, "modelALL.Scaled")
+summary(modelALL)
+
+
+#modelALL.NaOmit.Scaled <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_LatFirst), scale(Social_Duration)) ~ Trt + EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = Female.NaOmit)
+
+#saveRDS(modelALL.NaOmit.Scaled, "modelALL.NaOmit.Scaled")
+
+##### TotalDist, NovZone_Duration, Social_Duration #####
+
+# subeset High diet
+varibs.need <- c("LizID", "Trt","TotalDist", "NovZone_LatFirst", "NovZone_Duration", "Social_Duration", "EndMass")
+Female.High <- filter(DVR.Female, Trt == "High")[varibs.need] # Contain NAs in cbind(varibs) 
+str(Female.High) #1302 obs
+Female.High.na.omit <- na.omit(Female.High) #Excluding NAs 961 obs
+
+
+#priors
+prior <- list(R = list(V = diag(3), nu = 0.01), 
+              G = list(G1= list(V = diag(3), nu = 0.01)))
+
+#modelHI.NovDur <- MCMCglmm(cbind(TotalDist, NovZone_Duration, Social_Duration) ~ EndMass + trait-1, 
+#                   random = ~us(trait):LizID, 
+#                    rcov= ~us(trait):units, 
+#                    family = rep("gaussian", 3), 
+#                    prior = prior, 
+#                    nitt = 70000, 
+#                    burnin = 10000, 
+#                    thin = 100, 
+#                    data = Female.High)
+
+#saveRDS(modelHI.NovDur, "modelHI.NovDur")
+modelHI <- readRDS("modelHI.NovDur")
+plot(modelHI$VCV)
+autocorr(modelHI$VCV)
+
+summary(modelHI)
+posterior.mode(modelHI$VCV)
+HPDinterval(modelHI$VCV)
+
+scale(variable)
+
+posterior.mode(modelHI$Sol)
+HPDinterval(modelHI$Sol)
+
+
+#modelHI.NaOmit.NovDur <- MCMCglmm(cbind(TotalDist, NovZone_Duration, Social_Duration) ~ EndMass + trait-1, 
+#                   random = ~us(trait):LizID, 
+#                    rcov= ~us(trait):units, 
+#                    family = rep("gaussian", 3), 
+#                    prior = prior, 
+#                    nitt = 70000, 
+#                    burnin = 10000, 
+#                    thin = 100, 
+#                    data = Female.High.na.omit)
+
+#saveRDS(modelHI.NaOmit.NovDur, "modelHI.NaOmit.NovDur")
+modelHI.NaOmit.NovDur <- readRDS("modelHI.NaOmit.NovDur")
+
+#scaled
+#modelHI.ScNovDur <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_Duration), scale(Social_Duration)) ~ EndMass + trait-1, 
+#                           random = ~us(trait):LizID, 
+#                           rcov= ~us(trait):units, 
+#                           family = rep("gaussian", 3), 
+#                           prior = prior, 
+#                           nitt = 70000, 
+#                           burnin = 10000, 
+#                           thin = 100, 
+#                           data = Female.High)
+
+#saveRDS(modelHI.ScNovDur, "modelHI.ScNovDur")
+modelHI.Scaled <- readRDS("modelHI.Scaled")
+summary(modelHI.Scaled)
+
+
+
+
+#modelHI.NaOm.ScNovDur <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_Duration), scale(Social_Duration)) ~ EndMass + trait-1, 
+#                   random = ~us(trait):LizID, 
+#                    rcov= ~us(trait):units, 
+#                    family = rep("gaussian", 3), 
+#                    prior = prior, 
+#                    nitt = 70000, 
+#                    burnin = 10000, 
+#                    thin = 100, 
+#                    data = Female.High.na.omit)
+
+#saveRDS(modelHI.NaOm.ScNovDur, "modelHI.NaOm.ScNovDur")
+modelHI.NaOm.ScNovDur <- readRDS("modelHI.NaOm.ScNovDur")
+plot(modelHI$VCV)
+autocorr(modelHI$VCV)
+
+summary(modelHI)
+posterior.mode(modelHI$VCV)
+HPDinterval(modelHI$VCV)
+
+scale(variable)
+
+posterior.mode(modelHI$Sol)
+HPDinterval(modelHI$Sol)
+
+
+#  subset Low Diet
+
+Female.Low <- filter(DVR.Female, Trt == "Low")[varibs.need] # Contain NAs in cbind(varibs) 
+str(Female.Low) 
+Female.Low.na.omit <- na.omit(Female.Low) 
+
+#modelLOW.NovDur <- MCMCglmm(cbind(TotalDist, NovZone_Duration, Social_Duration) ~ EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = Female.Low)
+
+#saveRDS(modelLOW.NovDur, "modelLOW.NovDur")
+modelLOW <- readRDS("modelLOW.NovDur")
+
+
+#modelLOW.NaOmit.NovDur <- MCMCglmm(cbind(TotalDist, NovZone_Duration, Social_Duration) ~ EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = Female.Low.na.omit)
+
+#saveRDS(modelLOW.NaOmit.NovDur, "modelLOW.Na.omit.NovDur")
+modelLOW.NaOmit.NovDur <- readRDS("modelLOW.NaOmit.NovDur")
+
+
+#modelLOW.ScNovDur <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_Duration), scale(Social_Duration)) ~ EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = Female.Low)
+
+#saveRDS(modelLOW.ScNovDur, "modelLOW.ScNovDur")
+modelLOW.Scaled <- readRDS("modelLOW.ScNovDur")
+
+summary(modelLOW.ScNovDur)
+posterior.mode(modelHI$VCV)
+
+
+# All Female Data
+
+Female.All <- filter(DVR.Master, Sex == "F")[varibs.need] # Contain NAs in cbind(varibs) 
+str(DVR.Female) #2580 obs
+
+#modelALL.NovDur <- MCMCglmm(cbind(TotalDist, NovZone_Duration, Social_Duration) ~ Trt + EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = DVR.Female)
+
+#saveRDS(modelALL.NovDur, "modelALL.NovDur")
+summary(modelALL.NovDur)
+
+
+Female.All <- filter(DVR.Master, Sex == "F")[varibs.need] # Contain NAs in cbind(varibs) 
+str(Female.NaOmit)
+Female.NaOmit <- na.omit(Female.All) #1858 obvs
+
+#modelALL.NaOm.NovDur <- MCMCglmm(cbind(TotalDist, NovZone_Duration, Social_Duration) ~ Trt + EndMass +  trait-1, 
+#                     random = ~us(trait):LizID, 
+#                     rcov= ~us(trait):units, 
+#                     family = rep("gaussian", 3), 
+#                     prior = prior, 
+#                     nitt = 70000, 
+#                     burnin=10000, 
+#                     thin = 100, 
+#                     data = Female.NaOmit)
+
+#saveRDS(modelALL.NaOm.NovDur, "modelALL.NaOm.NovDur")
+
+summary(modelALL.NaOm.NovDur)
+
+#Scaled
+#modelALL.ScNovDur <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_Duration), scale(Social_Duration)) ~ Trt + EndMass +  trait-1, 
+#                            random = ~us(trait):LizID, 
+#                            rcov= ~us(trait):units, 
+#                            family = rep("gaussian", 3), 
+#                            prior = prior, 
+#                            nitt = 70000, 
+#                            burnin=10000, 
+#                            thin = 100, 
+#                            data = DVR.Female)
+
+
+#saveRDS(modelALL.ScNovDur, "modelALL.ScNovDur")
+summary(modelALL)
+
+
+#modelALL.NaOm.ScNovDur <- MCMCglmm(cbind(scale(TotalDist), scale(NovZone_Duration), scale(Social_Duration)) ~ Trt + EndMass +  trait-1, 
+#                                   random = ~us(trait):LizID, 
+#                                   rcov= ~us(trait):units, 
+#                                   family = rep("gaussian", 3), 
+#                                   prior = prior, 
+#                                   nitt = 70000, 
+#                                   burnin=10000, 
+#                                   thin = 100, 
+#                                   data = Female.NaOmit)
+
+#saveRDS(modelALL.NaOm.ScNovDur, "modelALL.NaOm.ScNovDur")
