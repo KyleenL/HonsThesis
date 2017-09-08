@@ -1,28 +1,4 @@
-DVR1=read.csv("DVR1Data.csv")
-DVR2=read.csv("DVR2Data.csv")
-DVR3=read.csv("DVR3Data.csv")
-BodySize=read.csv("BodySize.csv")
-
-
-datTest <- airquality
-head(datTest)
-str(datTest)
-
-datTest$Month <- factor(datTest$Month)
-
-car::scatterplotMatrix(~log(Ozone) + Wind, diagonal = "histogram", data = datTest)
-
-plot(log(Ozone) ~ Wind, data = datTest, ylab = "Log Transformed Ozone", xlab = "Wind", pch = 16)
-text(labels = rownames(datTest), y = log(datTest$Ozone), x = datTest$Wind)
-
-length(unique(datTest$Month))
-
-summarise(group_by(datTest, Month), mean = mean(Ozone, na.rm = TRUE))
-
-xtabs(~Month, data=datTest)
-
-
-#PACKAGES
+#####PACKAGES#####
 install.packages("dplyr")
 library(dplyr)
 
@@ -42,15 +18,16 @@ install.packages("car")
 library(car)
 
 
-#####HONOURS#####
+#####DATA#####
+DVR1=read.csv("DVR1Data.csv")
+DVR2=read.csv("DVR2Data.csv")
+DVR3=read.csv("DVR3Data.csv")
+BodySize=read.csv("BodySize.csv")
+
+
 Merged = merge(DVR1, DVR2, all=TRUE)
 DVR = merge(Merged, DVR3, all = TRUE)
 
-
-#for experimental changes
-    DVR.Master = DVR
-
-str(DVR.Master)
 
 #####HISTOGRAMS#####
 
@@ -137,10 +114,6 @@ DVR.Master <- DVR.Master[!is.na(DVR.Master$Arena_Duration),]
 #####CLEANING DATA#####
 DVR.Master$Results <- NULL   #removes Result column
 DVR.Master$Arena_Freq <- NULL   #removes Arena Freq column
-
-str_split_fixed(DVR.Master$ChDate, "_", 2)  #attempt to split ChDate Column
-group_by(DVR.Master, LizID)       #tried grouping by same ID
-DVR.Master[ ! DVR.Master$Sex %in% c(M), ]     #tried removing M rows
 
 
 
