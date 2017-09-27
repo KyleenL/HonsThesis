@@ -138,22 +138,21 @@ modelAllSub <- readRDS("modelAllSub")
 
 summary(modelAllSub)
 
-# matrix for All data modeled with Treatment added
-matAllSub <-posterior.mode(modelAllSub$VCV)
-HPDinterval(modelAllSub$VCV)
+##### matrix for All data modeled with Treatment added #####
+matAllSub <-posterior.mode(modelALLSub$VCV)
+HPDinterval(modelALLSub$VCV)
 
-head(modelAllSub$VCV)
+head(modelALLSub$VCV)
 LocationsAll <- grep("LizID", names(matAllSub))
 BAllSub <- matAllSub[LocationsAll]
 
+MatrixALL <- matricesT(BAllSub)
 
-B_mat_covAll <- matrix(BAllSub, nrow = 4, ncol = 4)
-B_mat_corAll <- cov2cor(B_mat_covAllT)
 
 
 #B = posterior.mode
 matricesT <- function(B, names = c("Activity", "Duration", "Latency", "Social")){
-  B_mat_covAllT <- matrix(BAllSubT, nrow = 4, ncol = 4)
+  B_mat_covAllT <- matrix(BAllSub, nrow = 4, ncol = 4)
   B_mat_corAllT <- cov2cor(B_mat_covAllT)
   colnames(B_mat_covAllT) <- colnames(B_mat_corAllT) <- names
   rownames(B_mat_covAllT) <- rownames(B_mat_corAllT) <- names
@@ -166,8 +165,11 @@ HPDinterval(modelAllSubT$VCV)
 
 
   # matrix for within individual on FemaleSubset
-LocationsAllW <- grep("unit", names(matAllSub))
-BAllSubW <- matAllSub[LocationsAllW]
+MatTrait <-posterior.mode(modelAllSub$VCV)
+HPDinterval(modelAllSub$VCV)
+
+LocationsTrait <- grep("units", names(MatTrait))
+BAllSubW <- MatTrait[LocationsTrait]
 
 
 matricesW <- function(B, names = c("Activity", "Duration", "Latency", "Social")){
@@ -193,7 +195,7 @@ matrixAllW <- matricesW(BAllSubW)
 #                        data = FemaleSubset)
 
 #saveRDS(modelAllSubT, "modelAllSubT")
-modelAllSubT <- readRDS("modelAllSubT")
+modelTrait <- readRDS("modelAllSubT")
 summary(modelAllSubT)
 
 plot(modelAllSubT$VCV)
@@ -203,17 +205,18 @@ HPDinterval(modelAllSubT$VCV)
 
 
   # matrix for All data modeled with Trt:trait
-matAllSubT <-posterior.mode(modelAllSubT$VCV)
-HPDinterval(modelAllSubT$VCV)
+matAllSubT <-posterior.mode(modelTrait$VCV)
+HPDinterval(modelTrait$VCV)
 
 head(modelAllSubT$VCV)
-LocationsAll <- grep("LizID", names(matAllSubT))
+LocationsAll <- grep("units", names(matAllSubT))
 BAllSubT <- matAllSubT[LocationsAll]
 
-
+matricesSubAllT <- matricesT(BAllSubT)
 B_mat_covAllT <- matrix(BAllSubT, nrow = 4, ncol = 4)
 B_mat_corAllT <- cov2cor(B_mat_covAllT)
 
+matrixTrait <- matricesT(BAllSubT)
 
 #B = posterior.mode
 matricesT <- function(B, names = c("Activity", "Duration", "Latency", "Social")){
@@ -342,112 +345,84 @@ posterior.mode(LRepeatability_Social)
 HPDinterval(LRepeatability_Social)
 
 
-## Repeatability for adjusted values
+#####Confidence intervals for Correlations Between Individuals#####
 
-#high activity repeatability in subset for adjusted values
-H.Activity_Locations.Adj <- grep("LogTotalDist", colnames(modelHighSub.Adj$VCV))
-H.Activity.Adj <- modelHighSub.Adj$VCV[,H.Activity_Locations.Adj]
-head(H.Activity.Adj)
+#Activity and Nov Lat 
+HPDinterval(modelHighSub$VCV[,"NovZone_LatFirst:LogTotalDist.LizID"] / (sqrt(modelHighSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.LizID"]) * sqrt(modelHighSub$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
+HPDinterval(modelLowSub$VCV[,"NovZone_LatFirst:LogTotalDist.LizID"] / (sqrt(modelLowSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.LizID"]) * sqrt(modelLowSub$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
+HPDinterval(modelALLSub$VCV[,"NovZone_LatFirst:LogTotalDist.LizID"] / (sqrt(modelALLSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.LizID"]) * sqrt(modelALLSub$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
+HPDinterval(modelTrait$VCV[,"NovZone_LatFirst:LogTotalDist.LizID"] / (sqrt(modelTrait$VCV[,"NovZone_LatFirst:NovZone_LatFirst.LizID"]) * sqrt(modelTrait$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
 
-HRL.Activity.Adj <- grep("LogTotalDist:LogTotalDist", colnames(H.Activity.Adj))
-HR.Activity.Adj <- H.Activity.Adj[,HRL.Activity.Adj]
+#Activity and Nov Duration
+HPDinterval(modelHighSubD$VCV[,"LogNovZone_Duration:LogTotalDist.LizID"] / (sqrt(modelHighSubD$VCV[,"LogNovZone_Duration:LogNovZone_Duration.LizID"]) * sqrt(modelHighSubD$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
+HPDinterval(modelLowSubD$VCV[,"LogNovZone_Duration:LogTotalDist.LizID"] / (sqrt(modelLowSubD$VCV[,"LogNovZone_Duration:LogNovZone_Duration.LizID"]) * sqrt(modelLowSubD$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
+HPDinterval(modelALLSub$VCV[,"LogNovZone_Duration:LogTotalDist.LizID"] / (sqrt(modelALLSub$VCV[,"LogNovZone_Duration:LogNovZone_Duration.LizID"]) * sqrt(modelALLSub$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
+HPDinterval(modelTrait$VCV[,"LogNovZone_Duration:LogTotalDist.LizID"] / (sqrt(modelTrait$VCV[,"LogNovZone_Duration:LogNovZone_Duration.LizID"]) * sqrt(modelTrait$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
 
-HRepeatability_Activity.Adj <- HR.Activity.Adj[,1] / (HR.Activity.Adj[,1] + HR.Activity.Adj[,2])
-posterior.mode(HRepeatability_Activity.Adj)
-HPDinterval(HRepeatability_Activity.Adj)
+#Activity and Social
+HPDinterval(modelHighSub$VCV[,"LogSocial_Duration:LogTotalDist.LizID"] / (sqrt(modelHighSub$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelHighSub$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
+HPDinterval(modelLowSub$VCV[,"LogSocial_Duration:LogTotalDist.LizID"] / (sqrt(modelLowSub$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelLowSub$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
+HPDinterval(modelAllSub$VCV[,"LogSocial_Duration:LogTotalDist.LizID"] / (sqrt(modelAllSub$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelAllSub$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
+HPDinterval(modelTrait$VCV[,"LogSocial_Duration:LogTotalDist.LizID"] / (sqrt(modelTrait$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelTrait$VCV[,"LogTotalDist:LogTotalDist.LizID"])))
 
-#high novel LatFirst repeatability in subset with adjusted values
-H.NovLatency_Locations.Adj <- grep("NovZone_LatFirst", colnames(modelHighSub.Adj$VCV))
-H.NovLatency.Adj <- modelHighSub.Adj$VCV[,H.NovLatency_Locations.Adj]
-head(H.NovLatency.Adj)
+#Nov Lat and Social
+HPDinterval(modelHighSub$VCV[,"LogSocial_Duration:NovZone_LatFirst.LizID"] / (sqrt(modelHighSub$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelHighSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.LizID"])))
+HPDinterval(modelLowSub$VCV[,"LogSocial_Duration:NovZone_LatFirst.LizID"] / (sqrt(modelLowSub$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelLowSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.LizID"])))
+HPDinterval(modelAllSub$VCV[,"LogSocial_Duration:NovZone_LatFirst.LizID"] / (sqrt(modelAllSub$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelAllSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.LizID"])))
+HPDinterval(modelTrait$VCV[,"LogSocial_Duration:NovZone_LatFirst.LizID"] / (sqrt(modelTrait$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelTrait$VCV[,"NovZone_LatFirst:NovZone_LatFirst.LizID"])))
 
-HRL.NovLatency.Adj <- grep("NovZone_LatFirst:NovZone_LatFirst", colnames(H.NovLatency.Adj))
-HR.NovLatency.Adj <- H.NovLatency.Adj[,HRL.NovLatency.Adj]
+#Nov Duration and Social
+HPDinterval(modelHighSubD$VCV[,"LogSocial_Duration:LogNovZone_Duration.LizID"] / (sqrt(modelHighSubD$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelHighSubD$VCV[,"LogNovZone_Duration:LogNovZone_Duration.LizID"])))
+HPDinterval(modelLowSubD$VCV[,"LogSocial_Duration:LogNovZone_Duration.LizID"] / (sqrt(modelLowSubD$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelLowSubD$VCV[,"LogNovZone_Duration:LogNovZone_Duration.LizID"])))
+HPDinterval(modelAllSub$VCV[,"LogSocial_Duration:LogNovZone_Duration.LizID"] / (sqrt(modelAllSub$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelAllSub$VCV[,"LogNovZone_Duration:LogNovZone_Duration.LizID"])))
+HPDinterval(modelTrait$VCV[,"LogSocial_Duration:LogNovZone_Duration.LizID"] / (sqrt(modelTrait$VCV[,"LogSocial_Duration:LogSocial_Duration.LizID"]) * sqrt(modelTrait$VCV[,"LogNovZone_Duration:LogNovZone_Duration.LizID"])))
 
-HRepeatability_NovLatency.Adj <- HR.NovLatency.Adj[,1] / (HR.NovLatency.Adj[,1] + HR.NovLatency.Adj[,2])
-posterior.mode(HRepeatability_NovLatency.Adj)
-HPDinterval(HRepeatability_NovLatency.Adj)
+#Nov Duration and Nov Lat
+HPDinterval(modelAllSub$VCV[,"NovZone_LatFirst:LogNovZone_Duration.LizID"] / (sqrt(modelAllSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.LizID"]) * sqrt(modelAllSub$VCV[,"LogNovZone_Duration:LogNovZone_Duration.LizID"])))
+HPDinterval(modelTrait$VCV[,"NovZone_LatFirst:LogNovZone_Duration.LizID"] / (sqrt(modelTrait$VCV[,"NovZone_LatFirst:NovZone_LatFirst.LizID"]) * sqrt(modelTrait$VCV[,"LogNovZone_Duration:LogNovZone_Duration.LizID"])))
 
-#high novel duration repeatability with adjusted values
-H.NovDuration_Locations.Adj <- grep("LogNovZone_Duration.Adj", colnames(modelHighSubD.Adj$VCV))
-H.NovDuration.Adj <- modelHighSubD.Adj$VCV[,H.NovDuration_Locations.Adj]
-head(H.NovDuration.Adj)
+#####Confidence intervals for Correlations Within Individuals#####
 
-HRL.NovDuration.Adj <- grep("LogNovZone_Duration.Adj:LogNovZone_Duration.Adj", colnames(H.NovDuration.Adj))
-HR.NovDuration.Adj <- H.NovDuration.Adj[,HRL.NovDuration.Adj]
+#Activity and Nov Lat 
+HPDinterval(modelHighSub$VCV[,"NovZone_LatFirst:LogTotalDist.units"] / (sqrt(modelHighSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.units"]) * sqrt(modelHighSub$VCV[,"LogTotalDist:LogTotalDist.units"])))
+HPDinterval(modelLowSub$VCV[,"NovZone_LatFirst:LogTotalDist.units"] / (sqrt(modelLowSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.units"]) * sqrt(modelLowSub$VCV[,"LogTotalDist:LogTotalDist.units"])))
+HPDinterval(modelAllSub$VCV[,"NovZone_LatFirst:LogTotalDist.units"] / (sqrt(modelAllSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.units"]) * sqrt(modelAllSub$VCV[,"LogTotalDist:LogTotalDist.units"])))
+HPDinterval(modelTrait$VCV[,"NovZone_LatFirst:LogTotalDist.units"] / (sqrt(modelTrait$VCV[,"NovZone_LatFirst:NovZone_LatFirst.units"]) * sqrt(modelTrait$VCV[,"LogTotalDist:LogTotalDist.units"])))
 
-HRepeatability_NovDuration.Adj <- HR.NovDuration.Adj[,1] / (HR.NovDuration.Adj[,1] + HR.NovDuration.Adj[,2])
-posterior.mode(HRepeatability_NovDuration.Adj)
-HPDinterval(HRepeatability_NovDuration.Adj)
+#Activity and Nov Duration
+HPDinterval(modelHighSubD$VCV[,"LogNovZone_Duration:LogTotalDist.units"] / (sqrt(modelHighSubD$VCV[,"LogNovZone_Duration:LogNovZone_Duration.units"]) * sqrt(modelHighSubD$VCV[,"LogTotalDist:LogTotalDist.units"])))
+HPDinterval(modelLowSubD$VCV[,"LogNovZone_Duration:LogTotalDist.units"] / (sqrt(modelLowSubD$VCV[,"LogNovZone_Duration:LogNovZone_Duration.units"]) * sqrt(modelLowSubD$VCV[,"LogTotalDist:LogTotalDist.units"])))
+HPDinterval(modelAllSub$VCV[,"LogNovZone_Duration:LogTotalDist.units"] / (sqrt(modelAllSub$VCV[,"LogNovZone_Duration:LogNovZone_Duration.units"]) * sqrt(modelAllSub$VCV[,"LogTotalDist:LogTotalDist.units"])))
+HPDinterval(modelTrait$VCV[,"LogNovZone_Duration:LogTotalDist.units"] / (sqrt(modelTrait$VCV[,"LogNovZone_Duration:LogNovZone_Duration.units"]) * sqrt(modelTrait$VCV[,"LogTotalDist:LogTotalDist.units"])))
 
-#high social duration repeatability with adjusted values
-H.Social_Locations.Adj <- grep("LogSocial_Duration.Adj", colnames(modelHighSub.Adj$VCV))
-H.Social.Adj <- modelHighSub.Adj$VCV[,H.Social_Locations.Adj]
-head(H.Social.Adj)
+#Activity and Social
+HPDinterval(modelHighSub$VCV[,"LogSocial_Duration:LogTotalDist.units"] / (sqrt(modelHighSub$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelHighSub$VCV[,"LogTotalDist:LogTotalDist.units"])))
+HPDinterval(modelLowSub$VCV[,"LogSocial_Duration:LogTotalDist.units"] / (sqrt(modelLowSub$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelLowSub$VCV[,"LogTotalDist:LogTotalDist.units"])))
+HPDinterval(modelAllSub$VCV[,"LogSocial_Duration:LogTotalDist.units"] / (sqrt(modelAllSub$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelAllSub$VCV[,"LogTotalDist:LogTotalDist.units"])))
+HPDinterval(modelTrait$VCV[,"LogSocial_Duration:LogTotalDist.units"] / (sqrt(modelTrait$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelTrait$VCV[,"LogTotalDist:LogTotalDist.units"])))
 
-HRL.Social.Adj <- grep("LogSocial_Duration.Adj:LogSocial_Duration.Adj", colnames(H.Social.Adj))
-HR.Social.Adj <- H.Social.Adj[,HRL.Social.Adj]
+#Nov Lat and Social
+HPDinterval(modelHighSub$VCV[,"LogSocial_Duration:NovZone_LatFirst.units"] / (sqrt(modelHighSub$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelHighSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.units"])))
+HPDinterval(modelLowSub$VCV[,"LogSocial_Duration:NovZone_LatFirst.units"] / (sqrt(modelLowSub$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelLowSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.units"])))
+HPDinterval(modelAllSub$VCV[,"LogSocial_Duration:NovZone_LatFirst.units"] / (sqrt(modelAllSub$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelAllSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.units"])))
+HPDinterval(modelTrait$VCV[,"LogSocial_Duration:NovZone_LatFirst.units"] / (sqrt(modelTrait$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelTrait$VCV[,"NovZone_LatFirst:NovZone_LatFirst.units"])))
 
-HRepeatability_Social.Adj <- HR.Social.Adj[,1] / (HR.Social.Adj[,1] + HR.Social.Adj[,2])
-posterior.mode(HRepeatability_Social.Adj)
-HPDinterval(HRepeatability_Social.Adj)
+#Nov Duration and Social
+HPDinterval(modelHighSubD$VCV[,"LogSocial_Duration:LogNovZone_Duration.units"] / (sqrt(modelHighSubD$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelHighSubD$VCV[,"LogNovZone_Duration:LogNovZone_Duration.units"])))
+HPDinterval(modelLowSubD$VCV[,"LogSocial_Duration:LogNovZone_Duration.units"] / (sqrt(modelLowSubD$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelLowSubD$VCV[,"LogNovZone_Duration:LogNovZone_Duration.units"])))
+HPDinterval(modelAllSub$VCV[,"LogSocial_Duration:LogNovZone_Duration.units"] / (sqrt(modelAllSub$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelAllSub$VCV[,"LogNovZone_Duration:LogNovZone_Duration.units"])))
+HPDinterval(modelTrait$VCV[,"LogSocial_Duration:LogNovZone_Duration.units"] / (sqrt(modelTrait$VCV[,"LogSocial_Duration:LogSocial_Duration.units"]) * sqrt(modelTrait$VCV[,"LogNovZone_Duration:LogNovZone_Duration.units"])))
 
-
-
-#low activity repeatability with adjusted values
-L.Activity_Locations.Adj <- grep("LogTotalDist", colnames(modelLowSub.Adj$VCV))
-L.Activity.Adj <- modelLowSub.Adj$VCV[,L.Activity_Locations.Adj]
-head(L.Activity.Adj)
-
-LRL.Activity.Adj <- grep("LogTotalDist:LogTotalDist", colnames(L.Activity.Adj))
-LR.Activity.Adj <- L.Activity.Adj[,LRL.Activity.Adj]
-
-LRepeatability_Activity.Adj <- LR.Activity.Adj[,1] / (LR.Activity.Adj[,1] + LR.Activity.Adj[,2])
-posterior.mode(LRepeatability_Activity.Adj)
-HPDinterval(LRepeatability_Activity.Adj)
-
-#low novel LatFirst repeatability with adjusted values
-L.NovLatency_Locations.Adj <- grep("NovZone_LatFirst", colnames(modelLowSub.Adj$VCV))
-L.NovLatency.Adj <- modelLowSub.Adj$VCV[,L.NovLatency_Locations.Adj]
-head(L.NovLatency.Adj)
-
-LRL.NovLatency.Adj <- grep("NovZone_LatFirst:NovZone_LatFirst", colnames(L.NovLatency.Adj))
-LR.NovLatency.Adj <- L.NovLatency.Adj[,LRL.NovLatency.Adj]
-
-LRepeatability_NovLatency.Adj <- LR.NovLatency.Adj[,1] / (LR.NovLatency.Adj[,1] + LR.NovLatency.Adj[,2])
-posterior.mode(LRepeatability_NovLatency.Adj)
-HPDinterval(LRepeatability_NovLatency.Adj)
-
-#low novel duration repeatability with adjusted values
-L.NovDuration_Locations.Adj <- grep("LogNovZone_Duration.Adj", colnames(modelLowSubD.Adj$VCV))
-L.NovDuration.Adj <- modelLowSubD.Adj$VCV[,L.NovDuration_Locations.Adj]
-head(L.NovDuration.Adj)
-
-LRL.NovDuration.Adj <- grep("LogNovZone_Duration.Adj:LogNovZone_Duration.Adj", colnames(L.NovDuration.Adj))
-LR.NovDuration.Adj <- L.NovDuration.Adj[,LRL.NovDuration.Adj]
-
-LRepeatability_NovDuration.Adj <- LR.NovDuration.Adj[,1] / (LR.NovDuration.Adj[,1] + LR.NovDuration.Adj[,2])
-posterior.mode(LRepeatability_NovDuration.Adj)
-HPDinterval(LRepeatability_NovDuration.Adj)
-
-#low social duration repeatability with adjusted values
-L.Social_Locations.Adj <- grep("LogSocial_Duration.Adj", colnames(modelLowSub.Adj$VCV))
-L.Social.Adj <- modelLowSub.Adj$VCV[,L.Social_Locations.Adj]
-head(L.Social.Adj)
-
-LRL.Social.Adj <- grep("LogSocial_Duration.Adj:LogSocial_Duration.Adj", colnames(L.Social.Adj))
-LR.Social.Adj <- L.Social.Adj[,HRL.Social.Adj]
-
-LRepeatability_Social.Adj <- LR.Social.Adj[,1] / (LR.Social.Adj[,1] + LR.Social.Adj[,2])
-posterior.mode(LRepeatability_Social.Adj)
-HPDinterval(LRepeatability_Social.Adj)
+#Nov Duration and Nov Lat
+HPDinterval(modelAllSub$VCV[,"NovZone_LatFirst:LogNovZone_Duration.units"] / (sqrt(modelAllSub$VCV[,"NovZone_LatFirst:NovZone_LatFirst.units"]) * sqrt(modelAllSub$VCV[,"LogNovZone_Duration:LogNovZone_Duration.units"])))
+HPDinterval(modelTrait$VCV[,"NovZone_LatFirst:LogNovZone_Duration.units"] / (sqrt(modelTrait$VCV[,"NovZone_LatFirst:NovZone_LatFirst.units"]) * sqrt(modelTrait$VCV[,"LogNovZone_Duration:LogNovZone_Duration.units"])))
 
 ##### Between Individual Matrices #####
 
 ## Example - also sets up matrix function
 modelHI <- readRDS("modelHI")
 
-mat <-posterior.mode(modelHI$VCV)
+mat <-posterior.mode(modelHighSub$VCV)
 HPDinterval(modelHI$VCV)
 
 head(modelHI$VCV)
@@ -470,10 +445,35 @@ return(list(cov = B_mat_cov, cor = B_mat_cor))
 }
 B.matrix <- matrices.Lat(B)
 
+modelHighSub <- readRDS("modelHighSub")
+head(modelHighSub$VCV)
+
+HPDinterval(modelHI$VCV)
+
+head(modelHI$VCV)
+Locations <- grep("LizID", names(mat))
+B <- mat[Locations]
+
+
+B_mat_cov <- matrix(B, nrow = 3, ncol = 3)
+B_mat_cor <- cov2cor(B_mat_cov)
+
+
+B = posterior.mode
+matrices.Lat <- function(B, names = c("Activity", "Latency", "Social")){
+  B_mat_cov <- matrix(B, nrow = 3, ncol = 3)
+  B_mat_cor <- cov2cor(B_mat_cov)
+  colnames(B_mat_cov) <- colnames(B_mat_cor) <- names
+  rownames(B_mat_cov) <- rownames(B_mat_cor) <- names
+  
+  return(list(cov = B_mat_cov, cor = B_mat_cor))
+}
+B.matrix <- matrices.Lat(B)
+
 #High subset - Only the active individuals 
 modelHighSub <- readRDS("modelHighSub")
 
-matHighSub <-posterior.mode(modelHighSub$VCV)
+matHighSub <- posterior.mode(modelHighSub$VCV)
 HPDinterval(modelHighSub$VCV)
 
 
@@ -499,35 +499,6 @@ LowSub.matrix <- matrices.Lat(B.LowSub)
 
 BLowSub_VCV <- modelLowSub$VCV[,LizID.Locations]
 MatrixLowSub <- apply(modelLowSub$VCV, 1, function(x) matrices.Lat(x))
-
-#High subset with adjusted values - Only the active individuals 
-modelHighSub.Adj <- readRDS("modelHighSub.Adj")
-
-matHighSub.Adj <-posterior.mode(modelHighSub.Adj$VCV)
-HPDinterval(modelHighSub.Adj$VCV)
-
-head(modelHighSub.Adj$VCV)
-B.HighSub.Adj <- matHighSub.Adj[Locations]
-
-HighSub.Adjmatrix <- matrices.Lat(B.HighSub.Adj)
-
-BHighSub.Adj_VCV <- modelHighSub.Adj$VCV[,LizID.Locations]
-MatrixHighSub.Adj <- apply(modelHighSub.Adj$VCV, 1, function(x) matrices.Lat(x))
-
-
-#Low subset with adjusted values - Only the active individuals 
-modelLowSub.Adj <- readRDS("modelLowSub.Adj")
-
-matLowSub.Adj <-posterior.mode(modelLowSub.Adj$VCV)
-HPDinterval(modelLowSub.Adj$VCV)
-
-head(modelLowSub.Adj$VCV)
-B.LowSub.Adj <- matLowSub.Adj[Locations]
-
-LowSub.Adjmatrix <- matrices.Lat(B.LowSub.Adj)
-
-BLowSub.Adj_VCV <- modelLowSub.Adj$VCV[,LizID.Locations]
-MatrixLowSub.Adj <- apply(modelLowSub.Adj$VCV, 1, function(x) matrices.Lat(x))
 
 
 ## Matrices with Novel Duration
@@ -571,21 +542,6 @@ HighSubDmatrix <- matrices.Dur(B.HighSubD)
 BHighSubD_VCV <- modelHighSubD$VCV[,LizID.Locations]
 MatrixHighSubD <- apply(modelHighSubD$VCV, 1, function(x) matrices.Dur(x))
 
-  #High adjusted subset
-modelHighSubD.Adj <- readRDS("modelHighSubD.Adj")
-
-matHighSubD.Adj <-posterior.mode(modelHighSubD.Adj$VCV)
-HPDinterval(modelHighSubD.Adj$VCV)
-
-head(modelHighSubD.Adj$VCV)
-B.HighSubD.Adj <- matHighSubD.Adj[Locations]
-
-HighSubDmatrix.Adj <- matrices.Dur(B.HighSubD.Adj)
-
-BHighSubD_VCV.Adj <- modelHighSubD.Adj$VCV[,LizID.Locations]
-MatrixHighSubD.Adj <- apply(modelHighSubD.Adj$VCV, 1, function(x) matrices.Dur(x))
-
-
 #Low subset matrix
 modelLowSubD <- readRDS("modelLowSubD")
 
@@ -600,26 +556,12 @@ LowSubDmatrix <- matrices.Dur(B.LowSubD)
 BLowSubD_VCV <- modelLowSubD$VCV[,LizID.Locations]
 MatrixLowSubD <- apply(modelLowSubD$VCV, 1, function(x) matrices.Dur(x))
 
-  #Low adjusted subset
-modelLowSubD.Adj <- readRDS("modelLowSubD.Adj")
-
-matLowSubD.Adj <-posterior.mode(modelLowSubD.Adj$VCV)
-HPDinterval(modelLowSubD.Adj$VCV)
-
-head(modelLowSubD.Adj$VCV)
-B.LowSubD.Adj <- matLowSubD.Adj[Locations]
-
-LowSubDmatrix.Adj <- matrices.Dur(B.LowSubD.Adj)
-
-BLowSubD_VCV.Adj <- modelLowSubD.Adj$VCV[,LizID.Locations]
-MatrixLowSubD.Adj <- apply(modelLowSubD.Adj$VCV, 1, function(x) matrices.Dur(x))
-
 ##### Within Individual Matrices #####
 
 ## Example - also sets up matrix function
 modelHI <- readRDS("modelHI")
 
-mat <-posterior.mode(modelHI$VCV)
+mat <-posterior.mode(modelHighSub$VCV)
 HPDinterval(modelHI$VCV)
 
 head(modelHI$VCV)
@@ -672,36 +614,6 @@ LowSub.matrix.wit <- matrices.LatW(B.LowSub.wit)
 BLowSub_VCV <- modelLowSub$VCV[,LizID.Locations]
 MatrixLowSub <- apply(modelLowSub$VCV, 1, function(x) matrices.Lat(x))
 
-#High subset with adjusted values - Only the active individuals 
-modelHighSub.Adj <- readRDS("modelHighSub.Adj")
-
-matHighSub.Adj <-posterior.mode(modelHighSub.Adj$VCV)
-HPDinterval(modelHighSub.Adj$VCV)
-
-head(modelHighSub.Adj$VCV)
-B.HighSub.Adj.wit <- matHighSub.Adj[Locations.wit]
-
-HighSub.Adjmatrix.wit <- matrices.LatW(B.HighSub.Adj.wit)
-
-BHighSub.Adj_VCV <- modelHighSub.Adj$VCV[,LizID.Locations]
-MatrixHighSub.Adj <- apply(modelHighSub.Adj$VCV, 1, function(x) matrices.Lat(x))
-
-
-#Low subset with adjusted values - Only the active individuals 
-modelLowSub.Adj <- readRDS("modelLowSub.Adj")
-
-matLowSub.Adj <-posterior.mode(modelLowSub.Adj$VCV)
-HPDinterval(modelLowSub.Adj$VCV)
-
-head(modelLowSub.Adj$VCV)
-B.LowSub.Adj.wit <- matLowSub.Adj[Locations.wit]
-
-LowSub.Adjmatrix.wit <- matrices.LatW(B.LowSub.Adj.wit)
-
-BLowSub.Adj_VCV <- modelLowSub.Adj$VCV[,LizID.Locations]
-MatrixLowSub.Adj <- apply(modelLowSub.Adj$VCV, 1, function(x) matrices.Lat(x))
-
-
 ## Matrices with Novel Duration
 
 ##Set up of new function
@@ -722,7 +634,7 @@ BD.matrix <- matrices.Dur(BD)
 matrices.DurW <- function(B.wit, names = c("Activity", "Novel", "Social")){
   BD_mat_cov.wit <- matrix(B.wit, nrow = 3, ncol = 3)
   BD_mat_cor.wit <- cov2cor(BD_mat_cov.wit)
-  colnames(BD_mat_cov.wit) <- colnames(BD_mat_cor) <- names
+  colnames(BD_mat_cov.wit) <- colnames(BD_mat_cor.wit) <- names
   rownames(BD_mat_cov.wit) <- rownames(BD_mat_cor.wit) <- names
   
   return(list(cov = BD_mat_cov.wit, cor = BD_mat_cor.wit))
@@ -743,21 +655,6 @@ HighSubDmatrix.wit <- matrices.DurW(B.HighSubD.wit)
 BHighSubD_VCV <- modelHighSubD$VCV[,LizID.Locations]
 MatrixHighSubD <- apply(modelHighSubD$VCV, 1, function(x) matrices.Dur(x))
 
-#High adjusted subset
-modelHighSubD.Adj <- readRDS("modelHighSubD.Adj")
-
-matHighSubD.Adj <-posterior.mode(modelHighSubD.Adj$VCV)
-HPDinterval(modelHighSubD.Adj$VCV)
-
-head(modelHighSubD.Adj$VCV)
-B.HighSubD.Adj.wit <- matHighSubD.Adj[Locations.wit]
-
-HighSubDmatrix.Adj.wit <- matrices.DurW(B.HighSubD.Adj.wit)
-
-BHighSubD_VCV.Adj <- modelHighSubD.Adj$VCV[,LizID.Locations]
-MatrixHighSubD.Adj <- apply(modelHighSubD.Adj$VCV, 1, function(x) matrices.Dur(x))
-
-
 #Low subset matrix
 modelLowSubD <- readRDS("modelLowSubD")
 
@@ -771,20 +668,6 @@ LowSubDmatrix.wit <- matrices.DurW(B.LowSubD.wit)
 
 BLowSubD_VCV <- modelLowSubD$VCV[,LizID.Locations]
 MatrixLowSubD <- apply(modelLowSubD$VCV, 1, function(x) matrices.Dur(x))
-
-#Low adjusted subset
-modelLowSubD.Adj <- readRDS("modelLowSubD.Adj")
-
-matLowSubD.Adj <-posterior.mode(modelLowSubD.Adj$VCV)
-HPDinterval(modelLowSubD.Adj$VCV)
-
-head(modelLowSubD.Adj$VCV)
-B.LowSubD.Adj <- matLowSubD.Adj[Locations]
-
-LowSubDmatrix.Adj <- matrices.Dur(B.LowSubD.Adj)
-
-BLowSubD_VCV.Adj <- modelLowSubD.Adj$VCV[,LizID.Locations]
-MatrixLowSubD.Adj <- apply(modelLowSubD.Adj$VCV, 1, function(x) matrices.Dur(x))
 
 
 ##### Box Plots #####
@@ -860,3 +743,64 @@ t.test(mean_SocialDuration.Adj ~ Trt, data = SocialFiltered, var.equal = TRUE)
 
 
 
+
+
+##### Forest Plots #####
+
+library("forestplot")
+
+RTable <- data.frame(Treatment = c("High", "Low"),
+                     Activity = c(0.386, 0.552),
+                     Latency = c(0.288, 0.208),
+                     Duration = c(0.246, 0.264),
+                     Social = c(0.349, 0.362))
+
+Rtable <- data.frame(Treatment = rep(c("High", "Low"), each = 4),
+                     Assay = rep(c("Activity", "Social", "Novel Latency", "Novel Duration"), 2), 
+                     Repeatabilty = c(0.386, 0.349, 0.288,0.246, 0.551, 0.362, 0.208, 0.264), 
+                     R_lower = c(0.221, 0.178, 0.165, 0.090, 0.329, 0.183, 0.096, 0.128), 
+                     R_upper = c(0.547, 0.524, 0.485, 0.386, 0.693, 0.601, 0.396, 0.465))
+
+ggplot(data = Rtable, aes(y = Repeatabilty, x = Assay, colour = Treatment)) + 
+  ggtitle("Repeatability of High and Low Diet Groups") +
+  geom_point() +  
+  geom_errorbar(aes(ymin = R_lower, ymax = R_upper), width = 0) +
+  coord_flip() 
+
+
+
+##### Within and Between plot #####
+library("ggplot2")
+
+  #Activity and Neophobia
+ggplot(data = FemaleSubset, aes(y = LogTotalDist, x = LogNovZone_Duration)) +
+  ggtitle("Correlations Between Activity and Neophobia") +
+  xlab("Log Time Spent in Novel Zone (s)") +
+  ylab("Log Total Distance Travelled (cm)") +
+  geom_abline(intercept = 3.5, slope = 0.6) +
+  geom_point(aes(colour = Trt))
+
+  #Activity and Sociality 
+ggplot(data = FemaleSubset, aes(y = LogTotalDist, x = LogSocial_Duration)) +
+  ggtitle("Correlations Between Activity and Sociality") +
+  xlab("Log Time Spent in Social Zone (s)") +
+  ylab("Log Total Distance Travelled (cm)") +
+  geom_abline(intercept = 3.5, slope = 0.5) +
+  geom_point(aes(colour = Trt))
+
+
+ggplot(data = FemaleSubset, aes(y = LogTotalDist, x = LogSocial_Duration)) +
+  geom_point(aes(colour = Trt)) +
+  geom_line(colour = "grey") +
+  facet_wrap(~Trt)
+
+
+##### Mantel Tests #####
+
+HighSub.matrix$cov
+LowSub.matrix$cov
+
+mantel.test(HighSub.matrix$cov, LowSub.matrix$cov)
+mantel.test(HighSub.matrix$cor, LowSub.matrix$cor)
+mantel.test(HighSub.matrix$cov, LowSub.matrix$cov)
+mantel.test(HighSub.matrix$cor, LowSub.matrix$cor)
