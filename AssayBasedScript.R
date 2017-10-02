@@ -763,37 +763,44 @@ Rtable <- data.frame(Treatment = rep(c("High", "Low"), each = 4),
 
 ggplot(data = Rtable, aes(y = Repeatabilty, x = Assay, colour = Treatment)) + 
   ggtitle("Repeatability of High and Low Diet Groups") +
-  geom_point() +  
   geom_errorbar(aes(ymin = R_lower, ymax = R_upper), width = 0) +
+  coord_flip() +
+  geom_point()
+
+ggplot(data = Rtable, aes(y = Repeatabilty, x = Assay, colour = Treatment)) + 
+  ggtitle("Repeatability of High and Low Diet Groups") +
+  geom_errorbar(aes(ymin = R_lower, ymax = R_upper), width = 0.1) +
+  geom_point() +
   coord_flip() 
-
-
-
 ##### Within and Between plot #####
 library("ggplot2")
 
-  #Activity and Neophobia
+  #Activity and Neophobia Duration
 ggplot(data = FemaleSubset, aes(y = LogTotalDist, x = LogNovZone_Duration)) +
-  ggtitle("Correlations Between Activity and Neophobia") +
+  ggtitle("Correlations Between Exploration and Neophobia") +
   xlab("Log Time Spent in Novel Zone (s)") +
   ylab("Log Total Distance Travelled (cm)") +
-  geom_abline(intercept = 3.5, slope = 0.6) +
   geom_point(aes(colour = Trt))
+
+#geom_abline(intercept = 3.5, slope = 0.6) +
+
+  #Activity and Novel Latency
+ggplot(data = FemaleSubset, aes(y = LogTotalDist, x = NovZone_LatFirst)) +
+  ggtitle("Correlations Between Exploration and Novel Latency") +
+  xlab("Latency (s)") +
+  ylab("Log Total Distance Travelled (cm)") +
+  geom_point(aes(colour = Trt))
+
 
   #Activity and Sociality 
 ggplot(data = FemaleSubset, aes(y = LogTotalDist, x = LogSocial_Duration)) +
-  ggtitle("Correlations Between Activity and Sociality") +
+  ggtitle("Correlations Between Exploration and Sociality") +
   xlab("Log Time Spent in Social Zone (s)") +
   ylab("Log Total Distance Travelled (cm)") +
-  geom_abline(intercept = 3.5, slope = 0.5) +
   geom_point(aes(colour = Trt))
 
-
-ggplot(data = FemaleSubset, aes(y = LogTotalDist, x = LogSocial_Duration)) +
-  geom_point(aes(colour = Trt)) +
-  geom_line(colour = "grey") +
-  facet_wrap(~Trt)
-
+#geom_abline(intercept = 3.5, slope = 0.5) 
+  
 
 ##### Mantel Tests #####
 
@@ -802,5 +809,46 @@ LowSub.matrix$cov
 
 mantel.test(HighSub.matrix$cov, LowSub.matrix$cov)
 mantel.test(HighSub.matrix$cor, LowSub.matrix$cor)
-mantel.test(HighSub.matrix$cov, LowSub.matrix$cov)
-mantel.test(HighSub.matrix$cor, LowSub.matrix$cor)
+mantel.test(HighSub.matrix.wit$cov, LowSub.matrix.wit$cov)
+mantel.test(HighSub.matrix.wit$cor, LowSub.matrix.wit$cor)
+
+
+##### End Mass Exploration #####
+
+modelMass <- MCMCglmm(cbind(LogTotalDist, LogNovZone_Duration, EndMass, LogSocial_Duration) ~ Trt:trait  +  trait-1, 
+                        random = ~us(trait):LizID, 
+                        rcov= ~us(trait):units, 
+                        family = rep("gaussian", 4), 
+                        prior = prior2, 
+                        nitt = 70000, 
+                        burnin=10000, 
+                        thin = 100, 
+                        data = FemaleSubset)
+summary(modelMass)
+
+## matrix for between
+matMass <-posterior.mode(modelMass$VCV)
+HPDinterval(modelMass$VCV)
+
+head(modelMass$VCV)
+LocationsMass <- grep("LizID", names(matMass))
+BMass <- matMass[LocationsMass]
+
+MatrixMass <- matricesM(BMass)
+
+
+
+#B = posterior.mode
+matricesM <- function(B, names = c("Activity", "Duration", "Mass", "Social")){
+  B_mat_covM <- matrix(BMass, nrow = 4, ncol = 4)
+  B_mat_corM <- cov2cor(B_mat_covM)
+  colnames(B_mat_covM) <- colnames(B_mat_corM) <- names
+  rownames(B_mat_covM) <- rownames(B_mat_corM) <- names
+  
+  return(list(cov = B_mat_covM, cor = B_mat_corM))
+}
+
+MatrixMass <- matricesM(BMass)
+HPDinterval(modelAllSubT$VCV)
+
+
