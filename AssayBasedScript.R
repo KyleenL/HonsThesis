@@ -196,12 +196,12 @@ matrixAllW <- matricesW(BAllSubW)
 
 #saveRDS(modelAllSubT, "modelAllSubT")
 modelTrait <- readRDS("modelAllSubT")
-summary(modelAllSubT)
+summary(modelTrait)
 
 plot(modelAllSubT$VCV)
 autocorr(modelAllSubT$VCV)
 posterior.mode(modelAllSubT$VCV)
-HPDinterval(modelAllSubT$VCV)
+HPDinterval(modelTrait$VCV)
 
 
   # matrix for All data modeled with Trt:trait
@@ -689,61 +689,31 @@ t.test(mean_LogTotalDist ~ Trt, data = ExplorationFiltered, var.equal = TRUE)
 #Novel
 
   # latency
-ggplot(Novel, aes(x = Trt, y = NovZone_LatFirst)) + geom_boxplot() + ggtitle("Novel Zone Latency (Ungrouped)") + xlab("Treatment") + ylab("Latency (s)")     #All data not grouped by ID
-t.test(NovZone_LatFirst ~ Trt, data = Novel, var.equal = TRUE)
-
 NovelFiltered <- Female %>%     #filters by LizID
   group_by(LizID, Trt) %>% 
   summarise(
     "mean_LogNovZone_Duration" = mean(log(NovZone_Duration+0.5), na.rm = TRUE),
-    "mean_LogNovZone_Duration.Adj" = mean(log(NovZone_Duration.Adj+0.5), na.rm = TRUE),
     "mean_Latency" = mean(NovZone_LatFirst)
   ) 
 
-ggplot(NovelFiltered, aes(x = Trt, y = mean_Latency)) + geom_boxplot() + ggtitle ("Novel Zone Latency (grouped)") + xlab("Treatment") + ylab("Latency (s)")     #plots grouped data by aevrage of each individual 
+ggplot(NovelFiltered, aes(x = Trt, y = mean_Latency)) + geom_boxplot() + ggtitle ("Novel Zone Latency") + xlab("Treatment") + ylab("Latency (s)")     #plots grouped data by aevrage of each individual 
 t.test(mean_Latency ~ Trt, data = NovelFiltered, var.equal = TRUE)
 
 
   # duration
-ggplot(Novel, aes(x = Trt, y = LogNovZone_Duration)) + geom_boxplot() + ggtitle("Novel Duration (Ungrouped)") + xlab("Treatment") + ylab("Cumulative Duration in Novel Zone (s)")   #ungrouped data
-t.test(LogNovZone_Duration ~ Trt, data = Novel, var.equal = TRUE)
-
-ggplot(NovelFiltered, aes(x = Trt, y = mean_LogNovZone_Duration)) + geom_boxplot() +ggtitle ("Novel Duration (grouped)") + xlab("Treatment") + ylab("Cumulative Duration in Novel Zone (s)") #grouped data
+ggplot(NovelFiltered, aes(x = Trt, y = mean_LogNovZone_Duration)) + geom_boxplot() +ggtitle ("Novel Duration") + xlab("Treatment") + ylab("Cumulative Duration in Novel Zone (s)") #grouped data
 t.test(mean_LogNovZone_Duration ~ Trt, data = NovelFiltered, var.equal = TRUE)
 
-  # adjusted values
-ggplot(Female, aes(x = Trt, y= LogNovZone_Duration.Adj)) + geom_boxplot() +ggtitle ("Adjusted Novel Duration (Ungrouped)") + xlab("Treatment") + ylab("Cumulative Duration in Novel Zone (s)")   #Ungrouped data
-t.test(LogNovZone_Duration.Adj ~ Trt, data = Female, var.equal = TRUE)
-
-ggplot(NovelFiltered, aes(x = Trt, y= mean_LogNovZone_Duration.Adj)) + geom_boxplot() +ggtitle ("Adjusted Novel Duration (Grouped)") + xlab("Treatment") + ylab("Cumulative Duration in Novel Zone (s)")  #grouped data
-t.test(mean_LogNovZone_Duration.Adj ~ Trt, data = NovelFiltered, var.equal = TRUE)
-
-
 #Social
-ggplot(Social, aes(x = Trt, y = LogSocial_Duration)) + geom_boxplot() + ggtitle("Social Zone Duration (Ungrouped)") + xlab("Treatment") + ylab("Time in Social Zone (s)")   # ungrouped data
-t.test(LogSocial_Duration ~ Trt, data = Social, var.equal = TRUE)
-
   # grouped by LizID
 SocialFiltered <- Female %>% 
   group_by(LizID, Trt) %>% 
   summarise(
-    "mean_SocialDuration" = mean(log(Social_Duration + 0.5), na.rm = TRUE),
-    "mean_SocialDuration.Adj" = mean(log(Social_Duration.Adj + 0.5), na.rm = TRUE)
+    "mean_SocialDuration" = mean(log(Social_Duration + 0.5), na.rm = TRUE)
   )
 
-ggplot(SocialFiltered, aes(x = Trt, y = mean_SocialDuration)) + geom_boxplot() +ggtitle ("Social Zone Duration (Grouped)") + xlab("Treatment") + ylab("Time in Social Zone (s)")  # grouped data
+ggplot(SocialFiltered, aes(x = Trt, y = mean_SocialDuration)) + geom_boxplot() +ggtitle ("Social Zone Duration") + xlab("Treatment") + ylab("Time in Social Zone (s)")  # grouped data
 t.test(mean_SocialDuration ~ Trt, data = SocialFiltered, var.equal = TRUE)
-
-# adjusted values
-ggplot(Female, aes(x = Trt, y= LogSocial_Duration.Adj)) + geom_boxplot() +ggtitle ("Adjusted Social Duration") + xlab("Treatment") + ylab("Time in Social Zone (s)")  # ungrouped and adjusted data
-t.test(LogSocial_Duration.Adj ~ Trt, data = Female, var.equal = TRUE)
-
-ggplot(SocialFiltered, aes(x = Trt, y = mean_SocialDuration.Adj)) + geom_boxplot() +ggtitle ("Adjusted Social Duration") + xlab("Treatment") + ylab("Time in Social Zone (s)")  # grouped and adjusted
-t.test(mean_SocialDuration.Adj ~ Trt, data = SocialFiltered, var.equal = TRUE)
-
-
-
-
 
 ##### Forest Plots #####
 
@@ -777,7 +747,7 @@ library("ggplot2")
 
   #Activity and Neophobia Duration
 ggplot(data = FemaleSubset, aes(y = LogTotalDist, x = LogNovZone_Duration)) +
-  ggtitle("Correlations Between Exploration and Neophobia") +
+  ggtitle("Correlations Between Exploration and Novel Duration") +
   xlab("Log Time Spent in Novel Zone (s)") +
   ylab("Log Total Distance Travelled (cm)") +
   geom_point(aes(colour = Trt))
@@ -799,6 +769,22 @@ ggplot(data = FemaleSubset, aes(y = LogTotalDist, x = LogSocial_Duration)) +
   ylab("Log Total Distance Travelled (cm)") +
   geom_point(aes(colour = Trt))
 
+
+#Neophobia and Sociality 
+ggplot(data = FemaleSubset, aes(y = LogNovZone_Duration, x = LogSocial_Duration)) +
+  ggtitle("Correlations Between Novel Duration and Sociality") +
+  xlab("Log Time Spent in Social Zone (s)") +
+  ylab("Log Time Spent in Novel Zone (s)") +
+  geom_point(aes(colour = Trt))
+
+
+#Latency and Sociality 
+ggplot(data = FemaleSubset, aes(y = NovZone_LatFirst, x = LogSocial_Duration)) +
+  ggtitle("Correlations Between Novel Latency and Sociality") +
+  xlab("Log Time Spent in Social Zone (s)") +
+  ylab("Latency (s)") +
+  geom_point(aes(colour = Trt))
+
 #geom_abline(intercept = 3.5, slope = 0.5) 
   
 
@@ -812,6 +798,10 @@ mantel.test(HighSub.matrix$cor, LowSub.matrix$cor)
 mantel.test(HighSub.matrix.wit$cov, LowSub.matrix.wit$cov)
 mantel.test(HighSub.matrix.wit$cor, LowSub.matrix.wit$cor)
 
+mantel.test(HighSubDmatrix$cov, LowSubDmatrix$cov)
+mantel.test(HighSubDmatrix$cor, LowSubDmatrix$cor)
+mantel.test(HighSubDmatrix.wit$cov, LowSubDmatrix.wit$cov)
+mantel.test(HighSubDmatrix.wit$cor, LowSubDmatrix.wit$cor)
 
 ##### End Mass Exploration #####
 
